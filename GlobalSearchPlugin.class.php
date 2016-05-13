@@ -470,7 +470,7 @@ class GlobalSearchPlugin extends StudIPPlugin implements SystemPlugin {
         // Forum
         $postings = $db->query("SELECT topic_id, name, content, user_id, seminar_id FROM forum_entries");
         while ($posting = $postings->fetch(PDO::FETCH_ASSOC)) {
-            $posting_content = preg_replace("/\[quote([=\d\w\s]*)\]([\d\w\s]*)\[\/quote\]/", "", $posting['description']);
+            $posting_content = preg_replace("/\[quote([=\d\w\s]*)\]([\d\w\s]*)\[\/quote\]/", "", $posting['content']);
             
             $posting_content = strip_tags(formatReady(str_replace("\n", " ", $posting_content)));
             
