@@ -406,7 +406,7 @@ class GlobalSearchPlugin extends StudIPPlugin implements SystemPlugin {
             $index->setEntry(
                 $seminar['Name'],
                 "seminar",
-                "details.php?cid=".$seminar['Seminar_id'],
+                "details.php?sem_id=".$seminar['Seminar_id'],
                 $seminar['visible'] ? null : $seminar['Seminar_id'],
                 $searchtext,
                 CourseAvatar::getAvatar($seminar['Seminar_id'])->getImageTag(Avatar::SMALL)." ".htmlReady($seminar['Name']),
@@ -422,7 +422,7 @@ class GlobalSearchPlugin extends StudIPPlugin implements SystemPlugin {
             $index->setEntry(
                 $user['Vorname']." ".$user['Nachname'],
                 "user",
-                "about.php?username=".$user['username'],
+                "dispatch.php/profile?username=".$user['username'],
                 ($user['visible'] !== "never" ? null : $user['user_id']),
                 $searchtext,
                 Avatar::getAvatar($user['user_id'])->getImageTag(Avatar::SMALL). " " .htmlReady($user['Vorname'])." ".htmlReady($user['Nachname']),
@@ -442,7 +442,7 @@ class GlobalSearchPlugin extends StudIPPlugin implements SystemPlugin {
             $index->setEntry(
                 $document['name'].($seminar_name ? " in ".$seminar_name : ""),
                 "document",
-                "folder.php?cid=".$document['seminar_id']."&cmd=all&open=".$document['dokument_id']."#anker",
+                "folder.php?cid=".$document['seminar_id']."&data[cmd]=tree&open=".$document['dokument_id']."#anker",
                 $document['seminar_id'],
                 $searchtext,
                 "<strong>".htmlReady($document['filename'])."</strong>: " .
@@ -475,13 +475,13 @@ class GlobalSearchPlugin extends StudIPPlugin implements SystemPlugin {
             $posting_content = strip_tags(formatReady(str_replace("\n", " ", $posting_content)));
             
             $searchtext = get_fullname($posting['user_id'])." ".$posting_content;
-            $sem_tree_ids = $db->query("SELECT sem_tree_id FROM seminar_sem_tree WHERE seminar_id = ".$db->quote($posting['Seminar_id']))->fetchAll(PDO::FETCH_COLUMN, 0);
+            $sem_tree_ids = $db->query("SELECT sem_tree_id FROM seminar_sem_tree WHERE seminar_id = ".$db->quote($posting['seminar_id']))->fetchAll(PDO::FETCH_COLUMN, 0);
             $searchtext .= GlobalSearchPlugin::getStudyareaSearchstring($sem_tree_ids);
             $index->setEntry(
                 $posting['name'],
                 "posting",
-                "forum.php?cid=".$posting['Seminar_id']."&view=tree&open=".$posting['topic_id']."#anker",
-                $posting['Seminar_id'],
+                "plugins.php/coreforum/index/index/{$posting['topic_id']}?cid={$posting['seminar_id']}",
+                $posting['seminar_id'],
                 $searchtext,
                 $posting_content,
                 $posting['topic_id']
@@ -495,7 +495,7 @@ class GlobalSearchPlugin extends StudIPPlugin implements SystemPlugin {
         $count += $result_object->count;
         
         if ($GLOBALS['IS_CLI']) {
-            echo "Index ersellt mit ".$count." Einträgen.";
+            echo "Index ersellt mit ".$count." Eintraegen.";
         } else {
             $template = $this->getTemplate("indexing.php");
             $template->set_attribute("count", $count);
